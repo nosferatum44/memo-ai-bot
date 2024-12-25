@@ -1,6 +1,6 @@
 import { createWordActionsKeyboard, mainKeyboard, cancelKeyboard } from '../utils/keyboards.js';
 
-export const handleMyWords = (bot, supabase) => async (msg) => {
+export const handleWordManagement = (bot, supabase) => async (msg) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
 
@@ -14,7 +14,7 @@ export const handleMyWords = (bot, supabase) => async (msg) => {
     if (error) throw error;
 
     if (!words.length) {
-      await bot.sendMessage(chatId, 'You haven\'t added any words yet!');
+      await bot.sendMessage(chatId, "You haven't added any words yet!");
       return;
     }
 
@@ -71,11 +71,7 @@ export const handleWordDelete = (bot, supabase) => async (msg, wordId) => {
   const userId = msg.from.id;
 
   try {
-    const { error } = await supabase
-      .from('words')
-      .delete()
-      .eq('id', wordId)
-      .eq('user_id', userId);
+    const { error } = await supabase.from('words').delete().eq('id', wordId).eq('user_id', userId);
 
     if (error) throw error;
 

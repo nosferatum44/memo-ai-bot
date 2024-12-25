@@ -1,5 +1,4 @@
 import { generateSentence } from '../utils/openai.js';
-import { updateWordProgress } from './wordProgressHandler.js';
 
 export const handlePractice = (bot, supabase) => async (msg) => {
   const chatId = msg.chat.id;
@@ -21,7 +20,7 @@ export const handlePractice = (bot, supabase) => async (msg) => {
     message += categories.map((cat, i) => `${i + 1}. ${cat.name}`).join('\n');
 
     const response = await bot.sendMessage(chatId, message);
-    
+
     // Wait for category selection
     bot.once('message', async (categoryMsg) => {
       try {
@@ -69,27 +68,31 @@ export const handlePractice = (bot, supabase) => async (msg) => {
           case 'translate':
             await bot.sendMessage(chatId, `Translate this word: ${word.word}`);
             break;
-          
+
           case 'multiple_choice':
             const options = words
-              .map(w => w.translation)
+              .map((w) => w.translation)
               .sort(() => Math.random() - 0.5)
               .slice(0, 4);
-            
+
             if (!options.includes(word.translation)) {
               options[3] = word.translation;
             }
-            
+
             const keyboard = {
               reply_markup: {
-                keyboard: options.map(option => [{text: option}]),
+                keyboard: options.map((option) => [{ text: option }]),
                 one_time_keyboard: true
               }
             };
-            
-            await bot.sendMessage(chatId, `Choose the correct translation for: ${word.word}`, keyboard);
+
+            await bot.sendMessage(
+              chatId,
+              `Choose the correct translation for: ${word.word}`,
+              keyboard
+            );
             break;
-          
+
           case 'fill_blank':
             const sentence = await generateSentence(word.word, word.translation);
             await bot.sendMessage(chatId, sentence);
@@ -103,7 +106,6 @@ export const handlePractice = (bot, supabase) => async (msg) => {
           practiceType,
           categoryName: selectedCategory.name
         };
-
       } catch (error) {
         console.error('Category selection error:', error);
         await bot.sendMessage(
@@ -113,13 +115,8 @@ export const handlePractice = (bot, supabase) => async (msg) => {
         );
       }
     });
-
   } catch (error) {
     console.error('Practice error:', error);
-    await bot.sendMessage(
-      chatId,
-      '❌ Failed to start practice. Please try again.',
-      mainKeyboard
-    );
+    await bot.sendMessage(chatId, '❌ Failed to start practice. Please try again.', mainKeyboard);
   }
 };

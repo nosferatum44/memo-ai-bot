@@ -1,4 +1,4 @@
-export const updateWordProgress = async (supabase, wordId, isCorrect) => {
+export const handleWordProgress = async (supabase, wordId, isCorrect) => {
   try {
     const { data: word } = await supabase
       .from('words')
